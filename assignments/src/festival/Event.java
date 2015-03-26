@@ -88,7 +88,7 @@ public class Event implements Comparable<Event> {
 	 */
 	@Override
 	public String toString() {
-		return act + ": session " + session + " at " + venue.toString; 
+		return act + ": session " + session + " at " + venue.toString(); 
 		
 	}
 
