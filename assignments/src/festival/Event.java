@@ -13,9 +13,23 @@ package festival;
  */
 public class Event implements Comparable<Event> {
 
-	// REMOVE THIS LINE AND INSERT YOUR INSTANCE VARIABLES AND IMPLEMENTATION
-	// INVARIANT HERE
-
+	
+	private Venue venue;
+	private int session;
+	private String act; 
+	
+	/*
+	 * Invariant
+	 * 
+	 * venue != null
+	 * 
+	 * session >0 and != null
+	 * 
+	 * act != null and not ''
+	 */
+	
+	
+	
 	/**
 	 * Creates a new event for the given venue, session and act.
 	 * 
@@ -31,7 +45,10 @@ public class Event implements Comparable<Event> {
 	 *             if session is not a positive integer
 	 */
 	public Event(Venue venue, int session, String act) {
-		// REMOVE THIS LINE AND WRITE THIS METHOD
+		this.venue = venue;
+		this.session = session;
+		this.act = act;
+		
 	}
 
 	/**
@@ -40,7 +57,7 @@ public class Event implements Comparable<Event> {
 	 * @return the venue of the event
 	 */
 	public Venue getVenue() {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return venue; 
 	}
 
 	/**
@@ -49,7 +66,7 @@ public class Event implements Comparable<Event> {
 	 * @return the session number of the event
 	 */
 	public int getSession() {
-		return -1; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return session; 
 	}
 
 	/**
@@ -58,7 +75,7 @@ public class Event implements Comparable<Event> {
 	 * @return the act of the event.
 	 */
 	public String getAct() {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return act; 
 	}
 
 	/**
@@ -71,7 +88,8 @@ public class Event implements Comparable<Event> {
 	 */
 	@Override
 	public String toString() {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return act + ": session " + session + " at " + venue.toString; 
+		
 	}
 
 	/**
@@ -89,7 +107,12 @@ public class Event implements Comparable<Event> {
 	 */
 	@Override
 	public boolean equals(Object object) {
-		return super.equals(object); // REMOVE THIS LINE AND WRITE THIS METHOD
+		if (!(object instanceof Event)) {
+			return false;
+		}
+		return act.equals(((Event) object).getAct())&&(session==((Event) object).getSession())
+				&&(venue.equals(((Event) object).getVenue()));
+		
 	}
 
 	/**
