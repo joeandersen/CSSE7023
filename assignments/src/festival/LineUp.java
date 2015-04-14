@@ -30,11 +30,22 @@ public class LineUp implements Iterable<Event> {
 	// REMOVE THIS LINE AND INSERT YOUR INSTANCE VARIABLES AND IMPLEMENTATION
 	// INVARIANT HERE
 
+	private ArrayList<Event> events;
+	
+	/*
+	 * Invariants
+	 * 
+	 * no clashing events with same venue and session
+	 * no null events
+	 * no duplicate events
+	 */
+	
+	
 	/**
 	 * Creates a new line-up with no events scheduled.
 	 */
 	public LineUp() {
-		// REMOVE THIS LINE AND WRITE THIS METHOD
+		events = new ArrayList<Event>();
 	}
 
 	/**
@@ -49,7 +60,20 @@ public class LineUp implements Iterable<Event> {
 	 *             session as the given event
 	 */
 	public void addEvent(Event event) {
-		// REMOVE THIS LINE AND WRITE THIS METHOD
+		if (event==null) {
+			throw new NullPointerException("no null events");
+		}
+		for (int j=0;j<events.size();j++){
+			if (events.get(j).getVenue().equals(event.getVenue())) {
+				if (events.get(j).getSession()== event.getSession()) {
+					throw new InvalidLineUpException("Event already scheduled at this venue/time");
+				}
+			}
+		}
+		if (!events.contains(event)) {
+			events.add(event);
+		}
+			
 	}
 
 	/**
@@ -61,7 +85,9 @@ public class LineUp implements Iterable<Event> {
 	 *            the event to be removed from the line-up.
 	 */
 	public void removeEvent(Event event) {
-		// REMOVE THIS LINE AND WRITE THIS METHOD
+		if (events.contains(event)) {
+			events.remove(event);
+		}
 	}
 
 	/**
@@ -76,7 +102,22 @@ public class LineUp implements Iterable<Event> {
 	 *             if the given venue is null
 	 */
 	public List<Event> getEvents(Venue venue) {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		
+		List<Event> venueEvents = new ArrayList();
+		
+		if (venue==null) {
+			throw new NullPointerException("no null venue permitted");
+		}
+		
+		for (int i = 0; i<events.size(); i++) {
+			if (events.get(i).getVenue().equals(venue)) {
+				venueEvents.add(events.get(i));
+			}
+		}
+		
+		Collections.sort(venueEvents);
+		
+		return venueEvents; 
 	}
 
 	/**
@@ -91,7 +132,22 @@ public class LineUp implements Iterable<Event> {
 	 *             if session <= 0
 	 */
 	public List<Event> getEvents(int session) {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		
+		List<Event> sessionEvents = new ArrayList();
+		
+		if (session<=0) {
+			throw new InvalidSessionException("no negative sessions permitted");
+		}
+		
+		for (int i = 0; i<events.size(); i++) {
+			if (events.get(i).getSession() == (session)) {
+				sessionEvents.add(events.get(i));
+			}
+		}
+		
+		Collections.sort(sessionEvents);
+		
+		return sessionEvents; 
 	}
 
 	/**
@@ -101,7 +157,18 @@ public class LineUp implements Iterable<Event> {
 	 * @return The venues where events from the line-up will take place.
 	 */
 	public Set<Venue> getVenues() {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		
+		Set<Venue> venues = new HashSet();
+		
+				
+		for (int i = 0; i<events.size(); i++) {
+			if (!venues.contains(events.get(i).getVenue())) {
+				venues.add(events.get(i).getVenue());
+			}
+		}
+		
+		
+		return venues; 
 	}
 
 	/**
@@ -113,7 +180,22 @@ public class LineUp implements Iterable<Event> {
 	 *         number that an event is scheduled for, and 0 otherwise.
 	 */
 	public int getFirstUsedSession() {
-		return -1; // REMOVE THIS LINE AND WRITE THIS METHOD
+		
+		
+		if (events.size()==0) {
+			return 0;
+		}
+		
+		int firstUsedSession = events.get(0).getSession();
+		
+		for (int i = 1; i<events.size(); i++) {
+			if (events.get(i).getSession() < firstUsedSession) {
+				firstUsedSession = events.get(i).getSession();
+			}
+		}
+		
+		
+		return firstUsedSession; 
 	}
 
 	/**
@@ -125,7 +207,20 @@ public class LineUp implements Iterable<Event> {
 	 *         number that an event is scheduled for, and 0 otherwise.
 	 */
 	public int getLastUsedSession() {
-		return -1; // REMOVE THIS LINE AND WRITE THIS METHOD
+		if (events.size()==0) {
+			return 0;
+		}
+		
+		int lastUsedSession = events.get(0).getSession();
+		
+		for (int i = 1; i<events.size(); i++) {
+			if (events.get(i).getSession() > lastUsedSession) {
+				lastUsedSession = events.get(i).getSession();
+			}
+		}
+		
+		
+		return lastUsedSession; 
 	}
 
 	/**
@@ -133,7 +228,7 @@ public class LineUp implements Iterable<Event> {
 	 */
 	@Override
 	public Iterator<Event> iterator() {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return events.iterator(); 
 	}
 
 	/**
@@ -148,7 +243,18 @@ public class LineUp implements Iterable<Event> {
 	 */
 	@Override
 	public String toString() {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		
+		String eventString = "";
+		
+		Collections.sort(events); //put events in natural order within list 
+		for (int j=0; j<events.size(); j++) {
+			eventString = eventString + events.get(j).toString();
+			if (j<events.size()-1) {
+				eventString = eventString + System.getProperty("line.separator");
+			}
+		}
+		
+		return eventString; 
 	}
 
 	/**
@@ -159,6 +265,33 @@ public class LineUp implements Iterable<Event> {
 	 *         otherwise.
 	 */
 	public boolean checkInvariant() {
+		for (int i=0; i<events.size();i++) {
+			Event event = events.get(i); //checking this event
+			if (event==null) {
+				return false; //checking if event is null
+			}
+			for (int j=0;j<events.size();j++){
+				
+				if (events.get(j).equals(event) && j!=i) {
+					return false; //checking if event is duplicated
+					
+				}
+								
+				if (j!=i&&events.get(j).getVenue().equals(event.getVenue())) {
+					if (events.get(j).getSession()== event.getSession()) {
+						return false; //checking if event is in a clash
+					}
+					
+				}
+			}
+			
+			
+			
+		}
+		
+		
+		
+		
 		return true; // REMOVE THIS LINE AND WRITE THIS METHOD
 	}
 

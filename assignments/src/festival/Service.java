@@ -13,9 +13,25 @@ package festival;
  */
 public class Service {
 
-	// REMOVE THIS LINE AND INSERT YOUR INSTANCE VARIABLES AND IMPLEMENTATION
-	// INVARIANT HERE
-
+	private Venue source;
+	private Venue destination;
+	private int session;
+	
+	
+	/*
+	 * Invariants:
+	 * 
+	 * source <> null
+	 * 
+	 * destination <> null
+	 * 
+	 * source <> destination
+	 * 
+	 * session >0
+	 * 
+	 */
+	
+	
 	/**
 	 * Creates a new service that departs the source venue at the end of the
 	 * given session, and arrives at the destination venue before the start of
@@ -35,7 +51,24 @@ public class Service {
 	 *             if session <= 0
 	 */
 	public Service(Venue source, Venue destination, int session) {
-		// REMOVE THIS LINE AND WRITE THIS METHOD
+		
+		if (source==null||destination==null) {
+			throw new NullPointerException("Service must run between non-null venues");
+		}
+		
+		this.source = source;
+		
+		if (source.equals(destination)) {
+			throw new InvalidServiceException("Service must run between distinct venues");
+		}
+		
+		this.destination = destination;
+		
+		if (session <=0) {
+			throw new InvalidSessionException("Session must be positive");
+		}
+		
+		this.session = session;
 	}
 
 	/**
@@ -44,7 +77,7 @@ public class Service {
 	 * @return the source venue of this service.
 	 */
 	public Venue getSource() {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return this.source; 
 	}
 
 	/**
@@ -53,7 +86,7 @@ public class Service {
 	 * @return the destination venue of this service.
 	 */
 	public Venue getDestination() {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return this.destination; 
 	}
 
 	/**
@@ -65,7 +98,7 @@ public class Service {
 	 * @return the session when this service departs
 	 */
 	public int getSession() {
-		return -1; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return this.session; 
 	}
 
 	/**
@@ -77,12 +110,17 @@ public class Service {
 	 */
 	@Override
 	public boolean equals(Object object) {
-		return super.equals(object); // REMOVE THIS LINE AND WRITE THIS METHOD
+		if (!(object instanceof Service)) {
+			return false;
+		}
+		return this.session==((Service) object).session 
+				&& this.source.equals(((Service) object).source)
+				&& this.destination.equals(((Service) object).destination);
 	}
 
 	@Override
 	public int hashCode() {
-		return super.hashCode(); // REMOVE THIS LINE AND WRITE THIS METHOD
+		return this.source.hashCode() + this.destination.hashCode()+ this.session;
 	}
 
 	/**
@@ -96,7 +134,8 @@ public class Service {
 	 */
 	@Override
 	public String toString() {
-		return null; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return "Departs "+this.source.toString()+" after session "
+					+session+" for "+this.destination.toString(); 
 	}
 
 	/**
@@ -107,6 +146,8 @@ public class Service {
 	 *         otherwise.
 	 */
 	public boolean checkInvariant() {
-		return true; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return this.source != null && this.destination !=null 
+				&&  !this.source.equals(this.destination) 
+				&& this.session>0; 
 	}
 }

@@ -25,7 +25,7 @@ public class Event implements Comparable<Event> {
 	 * 
 	 * session >0 and != null
 	 * 
-	 * act != null and not ''
+	 * act != null 
 	 */
 	
 	
@@ -45,7 +45,16 @@ public class Event implements Comparable<Event> {
 	 *             if session is not a positive integer
 	 */
 	public Event(Venue venue, int session, String act) {
+	
+		if (venue == null || act == null) {
+			throw new NullPointerException("Venue and Act cannot be null");
+		}
 		this.venue = venue;
+		
+		if (session <=0) {
+			throw new InvalidSessionException("Session must be positive");
+		}
+		
 		this.session = session;
 		this.act = act;
 		
@@ -123,7 +132,7 @@ public class Event implements Comparable<Event> {
 	 */
 	@Override
 	public int hashCode() {
-		return super.hashCode(); // REMOVE THIS LINE AND WRITE THIS METHOD
+		return venue.hashCode()+act.hashCode()+session; 
 	}
 
 	/**
@@ -134,7 +143,23 @@ public class Event implements Comparable<Event> {
 	 */
 	@Override
 	public int compareTo(Event event) {
-		return 0; // REMOVE THIS LINE AND WRITE THIS METHOD
+		
+		if (!this.venue.equals(event.venue)) { //If venues are different, order by venue name
+			return this.venue.getName().compareTo(event.venue.getName());
+		}
+		
+		if (!(this.getSession()==event.getSession())) {//If same venue, different sessions, compare by session number
+			if (this.getSession() < event.getSession()) {
+				return -1;
+			} else {
+				return 1;
+			}
+			
+		}		
+		//same venue, same session -> order by act name
+		return this.getAct().compareTo(event.getAct());
+		
+		
 	}
 
 	/**
@@ -144,6 +169,6 @@ public class Event implements Comparable<Event> {
 	 * @return true if this Event is internally consistent, and false otherwise.
 	 */
 	public boolean checkInvariant() {
-		return true; // REMOVE THIS LINE AND WRITE THIS METHOD
+		return venue!=null && session >0 && act != null; 
 	}
 }
