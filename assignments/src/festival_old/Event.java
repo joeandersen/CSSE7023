@@ -1,4 +1,4 @@
-package festival;
+package festival_old;
 
 /**
  * <p>
@@ -13,10 +13,6 @@ package festival;
  */
 public class Event implements Comparable<Event> {
 
-    // Joseph Andersen joe@joeandersen.com 33422619
-    //
-    // 15-4-15
-    
 	
 	private Venue venue; //venue of the event
 	private int session; //time of the event
@@ -145,8 +141,7 @@ public class Event implements Comparable<Event> {
 		return venue.hashCode()+act.hashCode()+session; 
 		//use the hashcodes of the venue, act and the value of the session 
 		//number to generate a hashcode. This ensures that equal events have 
-		//identical hashcodes, and similar events (same act and venue,
-        // but different session, say) have different hashcodes.
+		//identical hashcodes.
 	}
 
 	/**

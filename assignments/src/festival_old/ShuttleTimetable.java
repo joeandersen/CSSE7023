@@ -1,4 +1,4 @@
-package festival;
+package festival_old;
 
 import java.util.*;
 
@@ -15,10 +15,8 @@ import java.util.*;
  */
 public class ShuttleTimetable implements Iterable<Service> {
 
-    
-    // Joseph Andersen joe@joeandersen.com 33422619
-    //
-    // 15-4-15
+	// REMOVE THIS LINE AND INSERT YOUR INSTANCE VARIABLES AND IMPLEMENTATION
+	// INVARIANT HERE
 	
 	private ArrayList<Service> services;
 	
@@ -26,7 +24,6 @@ public class ShuttleTimetable implements Iterable<Service> {
 	/*
 	 * Invariant:
 	 * no duplicate services
-     * no null services
 	 */
 	
 
@@ -153,21 +150,17 @@ public class ShuttleTimetable implements Iterable<Service> {
 	 *         otherwise.
 	 */
 	public boolean checkInvariant() {
-		//Loop to check validity of services.
+		//Loop to check for duplicate services.
 		
 		for (int i = 0; i<services.size();i++) {
-            
-            if (services.get(i)==null) { //checking for null services
-                return false;
-            }
-            
 			for (int j = i+1; j<services.size();j++) {
 				if (services.get(i).equals(services.get(j))) {
-					return false; //checking for duplicates
+					return false;
 				}
 			}
 			
 		}
+		
 		
 		return true; 
 	}

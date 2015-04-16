@@ -1,8 +1,9 @@
-package festival.test;
+package festival_old.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import festival.*;
+
+import festival_old.*;
 
 /**
  * Basic tests for the {@link Service} implementation class.
@@ -50,4 +51,21 @@ public class ServiceTest {
 		Service s1 = new Service(new Venue("v1"), new Venue("v1"), 2);
 	}
 
+	/**
+	 * Test that the appropriate exception is thrown when a service is created
+	 * with null source stations.
+	 */
+	@Test(expected = NullPointerException.class)
+	public void testNullSource() {
+		Service s1 = new Service(null, new Venue("v1"), 2);
+	}
+	/**
+	 * Test that the appropriate exception is thrown when a service is created
+	 * with null destination stations.
+	 */
+	@Test(expected = NullPointerException.class)
+	public void testNullDestination() {
+		Service s1 = new Service(new Venue("v1"), null, 2);
+	}
+	
 }

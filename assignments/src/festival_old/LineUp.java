@@ -1,4 +1,4 @@
-package festival;
+package festival_old;
 
 import java.util.*;
 
@@ -27,9 +27,7 @@ import java.util.*;
  */
 public class LineUp implements Iterable<Event> {
 
-    // Joseph Andersen joe@joeandersen.com 33422619
-    //
-    // 15-4-15
+	
 
 	private ArrayList<Event> events; //Stores the list of events in the line-up
 	
@@ -292,6 +290,6 @@ public class LineUp implements Iterable<Event> {
 				}
 			}			
 		}			
-		return true; // nothing has failed, so return true.
+		return true; // REMOVE THIS LINE AND WRITE THIS METHOD
 	}
 }

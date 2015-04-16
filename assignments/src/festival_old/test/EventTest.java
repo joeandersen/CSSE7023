@@ -1,9 +1,9 @@
-package festival.test;
+package festival_old.test;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import festival.*;
+import festival_old.*;
 
 /**
  * Basic tests for the {@link Event} implementation class.
@@ -12,11 +12,6 @@ import festival.*;
  */
 public class EventTest {
 
-    
-    // Joseph Andersen joe@joeandersen.com 33422619
-    //
-    // 15-4-15
-    
 	/** Test construction of a typical event. */
 	@Test
 	public void testTypicalEvent() {
@@ -43,7 +38,7 @@ public class EventTest {
 		Event event111 = new Event(venue1, session1, act1);
 
 		Event event111a = new Event(venue1, session1, act1);
-		//"Different" object with same properties
+		//Different object with same properties
 		
 		
 		Event event112 = new Event(venue1, session1, act2);
@@ -80,34 +75,6 @@ public class EventTest {
 		
 		Assert.assertEquals(-1,event111.compareTo(event211));
 		Assert.assertEquals(1,event211.compareTo(event111));
-		
-		//check no functions break invariant
-		
-		Assert.assertTrue("Invariant incorrect", event111.checkInvariant());
-		venue1 = event111.getVenue();
-		Assert.assertTrue("Invariant incorrect", event111.checkInvariant());
-		session1 = event111.getSession();
-		Assert.assertTrue("Invariant incorrect", event111.checkInvariant());
-		act1 = event111.getAct();
-		Assert.assertTrue("Invariant incorrect", event111.checkInvariant());
-		String foo = event111.toString();
-		Assert.assertTrue("Invariant incorrect", event111.checkInvariant());
-		Boolean bar = event111.equals(event112);
-		Assert.assertTrue("Invariant incorrect", event111.checkInvariant());
-		int hashCode1 = event111.hashCode();
-		Assert.assertTrue("Invariant incorrect", event111.checkInvariant());
-		int compareator1 = event111.compareTo(event112);
-		Assert.assertTrue("Invariant incorrect", event111.checkInvariant());
-		
-		//can I add this event to a lineup without hurting it
-		LineUp lineUp = new LineUp();
-		lineUp.addEvent(event111);
-		Assert.assertTrue("Invariant incorrect", event111.checkInvariant());
-		
-		
-		
-		
-		
 	}
 	
 	/**

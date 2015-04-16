@@ -1,4 +1,4 @@
-package festival;
+package festival_old;
 
 /**
  * <p>
@@ -13,10 +13,6 @@ package festival;
  */
 public class Service {
 
-    // Joseph Andersen joe@joeandersen.com 33422619
-    //
-    // 15-4-15
-    
 	private Venue source; //where service starts from
 	private Venue destination; //where service goes
 	private int session; //when service goes (at end of session)
