@@ -1,8 +1,9 @@
-package festival.test;
+package festival_ass1_submitted.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import festival.*;
+
+import festival_ass1_submitted.*;
 
 /**
  * Basic tests for the {@link Service} implementation class.

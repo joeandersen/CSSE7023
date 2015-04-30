@@ -1,6 +1,6 @@
-package festival.test;
+package festival_ass1_submitted.test;
 
-import festival.*;
+import festival_ass1_submitted.*;
 
 import java.util.*;
 

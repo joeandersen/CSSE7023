@@ -1,4 +1,4 @@
-package festival;
+package festival_ass1_submitted;
 
 /**
  * <p>
@@ -13,15 +13,27 @@ package festival;
  */
 public class Event implements Comparable<Event> {
 
-	// the venue where the event is happening
-	private Venue venue;
-	// the number of the session this event will occur in
-	private int session;
-	// a description of the act that is playing at this event
-	private String act;
-
-	/* Invariant: venue!= null && act != null && 0 < session */
-
+    // Joseph Andersen joe@joeandersen.com 33422619
+    //
+    // 15-4-15
+    
+	
+	private Venue venue; //venue of the event
+	private int session; //time of the event
+	private String act;  //act performing
+	
+	/*
+	 * Invariant
+	 * 
+	 * venue != null
+	 * 
+	 * session >0 and != null
+	 * 
+	 * act != null 
+	 */
+	
+	
+	
 	/**
 	 * Creates a new event for the given venue, session and act.
 	 * 
@@ -37,16 +49,24 @@ public class Event implements Comparable<Event> {
 	 *             if session is not a positive integer
 	 */
 	public Event(Venue venue, int session, String act) {
-		if (venue == null || act == null) {
-			throw new NullPointerException("Parameters cannot be null");
-		}
-		if (session <= 0) {
-			throw new InvalidSessionException("Session number " + session
-					+ " must be positive");
+		
+		//checking valid parameters
+		
+		if (venue == null || act == null) { 
+			throw new NullPointerException("Venue and Act cannot be null");
 		}
 		this.venue = venue;
+		
+		if (session <=0) {
+			throw new InvalidSessionException("Session must be positive");
+		}
+		
+		//if parameters ok, store them in the class'
+		//fields
+		
 		this.session = session;
 		this.act = act;
+		
 	}
 
 	/**
@@ -55,7 +75,7 @@ public class Event implements Comparable<Event> {
 	 * @return the venue of the event
 	 */
 	public Venue getVenue() {
-		return venue;
+		return venue; 
 	}
 
 	/**
@@ -64,7 +84,7 @@ public class Event implements Comparable<Event> {
 	 * @return the session number of the event
 	 */
 	public int getSession() {
-		return session;
+		return session; 
 	}
 
 	/**
@@ -73,7 +93,7 @@ public class Event implements Comparable<Event> {
 	 * @return the act of the event.
 	 */
 	public String getAct() {
-		return act;
+		return act; 
 	}
 
 	/**
@@ -86,7 +106,8 @@ public class Event implements Comparable<Event> {
 	 */
 	@Override
 	public String toString() {
-		return act + ": session " + session + " at " + venue;
+		return act + ": session " + session + " at " + venue.toString(); 
+		
 	}
 
 	/**
@@ -105,12 +126,12 @@ public class Event implements Comparable<Event> {
 	@Override
 	public boolean equals(Object object) {
 		if (!(object instanceof Event)) {
-			return false;
+			return false; //checking we're comparing events with events
 		}
-		Event event = (Event) object; // event to compare
-		return (this.venue.equals(event.venue))
-				&& (this.session == event.session)
-				&& (this.act.equals(event.act));
+		return act.equals(((Event) object).getAct())
+				&&(session==((Event) object).getSession())
+				&&(venue.equals(((Event) object).getVenue()));
+		//check whether events have same act, session, and venue
 	}
 
 	/**
@@ -121,13 +142,11 @@ public class Event implements Comparable<Event> {
 	 */
 	@Override
 	public int hashCode() {
-		// creates a polynomial hashcode based on the fields of the event.
-		final int prime = 31; // an odd base prime
-		int result = 1; // the hash code under construction
-		result = prime * result + act.hashCode();
-		result = prime * result + session;
-		result = prime * result + venue.hashCode();
-		return result;
+		return venue.hashCode()+act.hashCode()+session; 
+		//use the hashcodes of the venue, act and the value of the session 
+		//number to generate a hashcode. This ensures that equal events have 
+		//identical hashcodes, and similar events (same act and venue,
+        // but different session, say) have different hashcodes.
 	}
 
 	/**
@@ -138,15 +157,25 @@ public class Event implements Comparable<Event> {
 	 */
 	@Override
 	public int compareTo(Event event) {
-		// the result of comparing this to the event
-		int result = venue.getName().compareTo(event.venue.getName());
-		if (result == 0) {
-			result = session - event.session;
+		
+		if (!this.venue.equals(event.venue)) { 
+			//If venues are different, order by venue name
+			return this.venue.getName().compareTo(event.venue.getName());
 		}
-		if (result == 0) {
-			result = act.compareTo(event.act);
-		}
-		return result;
+		
+		if (!(this.getSession()==event.getSession())) {
+			//If same venue, different sessions, compare by session number
+			if (this.getSession() < event.getSession()) {
+				return -1;
+			} else {
+				return 1;
+			}
+			
+		}		
+		//same venue, same session -> order by act name
+		return this.getAct().compareTo(event.getAct());
+		
+		
 	}
 
 	/**
@@ -156,6 +185,6 @@ public class Event implements Comparable<Event> {
 	 * @return true if this Event is internally consistent, and false otherwise.
 	 */
 	public boolean checkInvariant() {
-		return (venue != null && act != null && session > 0);
+		return venue!=null && session >0 && act != null; 
 	}
 }

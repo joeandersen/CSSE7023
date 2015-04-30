@@ -1,4 +1,4 @@
-package festival;
+package festival_ass1_submitted;
 
 /**
  * <p>
@@ -13,18 +13,29 @@ package festival;
  */
 public class Service {
 
-	// the venue that the service departs from
-	private Venue source;
-	// the venue that the service arrives at
-	private Venue destination;
-	// the service departs for its destination at the end of this session
-	private int session;
-
+    // Joseph Andersen joe@joeandersen.com 33422619
+    //
+    // 15-4-15
+    
+	private Venue source; //where service starts from
+	private Venue destination; //where service goes
+	private int session; //when service goes (at end of session)
+	
+	
 	/*
-	 * Invariant: source != null && destination != null &&
-	 * !source.equals(destination) && session > 0
+	 * Invariants:
+	 * 
+	 * source <> null
+	 * 
+	 * destination <> null
+	 * 
+	 * source <> destination
+	 * 
+	 * session >0
+	 * 
 	 */
-
+	
+	
 	/**
 	 * Creates a new service that departs the source venue at the end of the
 	 * given session, and arrives at the destination venue before the start of
@@ -44,19 +55,27 @@ public class Service {
 	 *             if session <= 0
 	 */
 	public Service(Venue source, Venue destination, int session) {
-		if (source == null || destination == null) {
-			throw new NullPointerException("Input parameters cannot be null");
+		
+		//checking for valid parameters 
+		
+		if (source==null||destination==null) {
+			throw new NullPointerException("Service must run between "
+					+ "non-null venues");
 		}
-		if (source.equals(destination)) {
-			throw new InvalidServiceException(
-					"The source and destination venue cannot be the same");
-		}
-		if (session <= 0) {
-			throw new InvalidSessionException("Session number " + session
-					+ " must be positive");
-		}
+		
 		this.source = source;
+		
+		if (source.equals(destination)) {
+			throw new InvalidServiceException("Service must run between "
+					+ "distinct venues");
+		}
+		
 		this.destination = destination;
+		
+		if (session <=0) {
+			throw new InvalidSessionException("Session must be positive");
+		}
+		
 		this.session = session;
 	}
 
@@ -66,7 +85,7 @@ public class Service {
 	 * @return the source venue of this service.
 	 */
 	public Venue getSource() {
-		return source;
+		return this.source; 
 	}
 
 	/**
@@ -75,7 +94,7 @@ public class Service {
 	 * @return the destination venue of this service.
 	 */
 	public Venue getDestination() {
-		return destination;
+		return this.destination; 
 	}
 
 	/**
@@ -87,7 +106,7 @@ public class Service {
 	 * @return the session when this service departs
 	 */
 	public int getSession() {
-		return session;
+		return this.session; 
 	}
 
 	/**
@@ -102,21 +121,14 @@ public class Service {
 		if (!(object instanceof Service)) {
 			return false;
 		}
-		Service service = (Service) object; // service to compare
-		return this.source.equals(service.source)
-				&& this.destination.equals(service.destination)
-				&& this.session == service.session;
+		return this.session==((Service) object).session 
+				&& this.source.equals(((Service) object).source)
+				&& this.destination.equals(((Service) object).destination);
 	}
 
 	@Override
 	public int hashCode() {
-		// calculates polynomial hashcode
-		final int prime = 31; // a prime
-		int result = 1; // hash code under construction
-		result = prime * result + source.hashCode();
-		result = prime * result + destination.hashCode();
-		result = prime * result + session;
-		return result;
+		return this.source.hashCode() + this.destination.hashCode()+ this.session;
 	}
 
 	/**
@@ -130,8 +142,8 @@ public class Service {
 	 */
 	@Override
 	public String toString() {
-		return "Departs " + source + " after session " + session + " for "
-				+ destination;
+		return "Departs "+this.source.toString()+" after session "
+					+session+" for "+this.destination.toString(); 
 	}
 
 	/**
@@ -142,7 +154,8 @@ public class Service {
 	 *         otherwise.
 	 */
 	public boolean checkInvariant() {
-		return (source != null && destination != null
-				&& !source.equals(destination) && session > 0);
+		return this.source != null && this.destination !=null 
+				&&  !this.source.equals(this.destination) 
+				&& this.session>0; 
 	}
 }
