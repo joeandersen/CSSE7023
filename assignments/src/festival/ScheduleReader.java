@@ -1,22 +1,15 @@
 package festival;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * Provides a method to read a shuttle timetable from a file.
  */
 public class ScheduleReader {
 
-	private static Set<String> setOfVenues;
-	// a set of venue names, used to check for
-	// source venue repetition.
-	private static int numberOfSessions; // the number of sessions in the
-											// festival.
+	// definition of an empty line
+	private final static String EMPTY_LINE = "";
 
 	/**
 	 * <p>
@@ -79,155 +72,211 @@ public class ScheduleReader {
 	 */
 	public static ShuttleTimetable read(String fileName) throws IOException,
 			FormatException {
+		// scanner for reading the file
+		Scanner in = new Scanner(new FileReader(fileName));
+		// the shuttle timetable to be returned
+		ShuttleTimetable timetable = new ShuttleTimetable();
+		Set<Venue> venues = new HashSet<>(); // source venues read so far
+		int lineNumber = 0; // the number of the line being read
 
-		setOfVenues = new HashSet<String>(); // initialize the set
-		Scanner s = new Scanner(new File(fileName)); // open the file, start
-														// scanning it.
-		String line = s.nextLine();
-		// System.out.println(line);
-		getNumberOfSessions(line);// parse first line for numebr of sessions
-
-		ShuttleTimetable myTimeTable = new ShuttleTimetable(); // initialize the
-																// schedule
-		while (s.hasNextLine()) { // each cycle of this loop reads in all the
-									// data for a single source venue, checking
-									// the format, and for repeats etc.
-
-			Venue sourceVenue = getSourceVenue(s.nextLine());// parse and check
-																// source venue
-																// line,
-																// generate
-																// source venue.
-
-			Set<Service> services = getServicesFromVenue(s, sourceVenue);
-			// get the set of services for this venue
-
-			// loop over services, add into the timetable. services already
-			// gauranteed not to have duplicates
-			for (Service newService : services) {
-				myTimeTable.addService(newService);
+		// read number of sessions in festival from first line of in
+		int numSessions = readNumberSessions(in, ++lineNumber);
+		try {
+			// read in the services for each source venue
+			while (in.hasNextLine()) {
+				// read source venue from next line of in
+				Venue source =
+						readSourceVenue(in.nextLine(), ++lineNumber, venues);
+				for (int session = 1; session <= numSessions; session++) {
+					// read services for source and session from next line of in
+					readServices(in, ++lineNumber, source, session, timetable);
+				}
+				checkLineIsEmpty(in.hasNextLine() ? in.nextLine() : null,
+						++lineNumber);
 			}
-
-			checkNextLine(s); // next line should be blank
-
+		} finally {
+			in.close();
 		}
-
-		s.close();
-
-		return myTimeTable;
+		return timetable;
 	}
 
 	/**
-	 * Checks if the line after the data for a venue is empty.
-	 * 
-	 * @param s
+	 * @require in!=null && in is open for reading
+	 * @ensure reads next line from scanner, and returns session number from
+	 *         that line
 	 * @throws FormatException
+	 *             if there is no next line in the scanner, or the line does not
+	 *             contain one positive integer denoting the session number.
 	 */
-	
-	private static void checkNextLine(Scanner s) throws FormatException {
-		if (s.hasNextLine()){
-			String line = s.nextLine().trim();
-			//System.out.println(line);
-	
-			if (!line.isEmpty()) {
-				s.close();
-				throw new FormatException("must have blank line between venues");
+	private static int readNumberSessions(Scanner in, int lineNumber)
+			throws FormatException {
+		// number of sessions to be read
+		int numberOfSessions = 0;
+		// scanner for parsing the line containing the number of sessions
+		Scanner lineScanner = null;
+		try {
+			if (in.hasNextLine()) {
+				lineScanner = new Scanner(in.nextLine());
+				if (lineScanner.hasNextInt()) {
+					numberOfSessions = lineScanner.nextInt();
+				}
+				if (numberOfSessions <= 0) {
+					throw new FormatException("Line " + lineNumber
+							+ ": invalid number of sessions");
+				}
+				if (lineScanner.hasNext()) {
+					throw new FormatException("Line " + lineNumber
+							+ ": extra information on line");
+				}
+			} else {
+				throw new FormatException("Line " + lineNumber
+						+ ": number of sessions not specified");
 			}
-		}else {
-			s.close();
-			throw new FormatException("must have blank line after final venue");
+		} finally {
+			if (lineScanner != null) {
+				lineScanner.close();
+			}
+		}
+		return numberOfSessions;
+	}
+
+	/**
+	 * @require venues != null && line != null
+	 * @ensure creates a new venue with it's name specified on the input line,
+	 *         and adds it to the set of venues, and returns it
+	 * @throws FormatException
+	 *             if there is no venue name on the line, or the venue read is
+	 *             already in venues, or there is additional information on the
+	 *             venue line.
+	 */
+	private static Venue readSourceVenue(String line, int lineNumber,
+			Set<Venue> venues) throws FormatException {
+		// scanner for parsing the line containing the source venue
+		Scanner lineScanner = null;
+		try {
+			lineScanner = new Scanner(line);
+			if (lineScanner.hasNext()) {
+				Venue source = new Venue(lineScanner.next()); // source venue
+				if (venues.contains(source)) {
+					throw new FormatException("Line " + lineNumber
+							+ ": duplicate source venue");
+				}
+				if (lineScanner.hasNext()) {
+					throw new FormatException("Line " + lineNumber
+							+ ": extra information on line");
+				}
+				venues.add(source);
+				return source;
+			} else {
+				throw new FormatException("Line " + lineNumber
+						+ ": no venue name given");
+			}
+		} finally {
+			if (lineScanner != null) {
+				lineScanner.close();
+			}
 		}
 	}
 
 	/**
-	 * Parses the first line of the schedule data file to extract the number of
-	 * sessions in the festival.
-	 * 
-	 * @Param myLine: The string that system is to parse
-	 * 
-	 * @Return numberOfSessions: a positive integer that tells the system how
-	 *         many sessions there are int he festival.
-	 * 
-	 * @Throws FormatException: If the line does not correctly resolve to a
-	 *         valid number of sessions
+	 * @require in != null && in is not closed && source != null && session > 0
+	 *          && timetable != null
+	 * @ensure reads services for source at session from the next line in the
+	 *         scanner and adds them to the timetable
+	 * @throws FormatException
+	 *             if there is no next line on the scanner, or if the line is
+	 *             not correctly formatted (i.e. it does not start with the
+	 *             given session, or the services are not valid or contain
+	 *             duplicates.)
 	 */
+	private static void readServices(Scanner in, int lineNumber, Venue source,
+			int session, ShuttleTimetable timetable) throws FormatException {
+		Scanner lineScanner = null; // scanner for the line
 
-	private static void getNumberOfSessions(String myLine)
-			throws FormatException {
+		// check that there is a line for session
+		if (!in.hasNextLine()) {
+			throw new FormatException("Line " + lineNumber + ": "
+					+ "not enough sessions for" + source);
+		}
 
 		try {
-			numberOfSessions = Integer.parseInt(myLine.trim());
-		} catch (NumberFormatException c) {
-			throw new FormatException("first line of file must be an integer");
+			lineScanner = new Scanner(in.nextLine());
+			// read session number and check that it equals the given session
+			readSessionNumber(lineScanner, lineNumber, session);
+			// create and add a service for each destination venue
+			while (lineScanner.hasNext()) {
+				Venue destination = new Venue(lineScanner.next());
+				addService(lineNumber, timetable, source, destination, session);
+			}
+		} finally {
+			if (lineScanner != null) {
+				lineScanner.close();
+			}
 		}
-		if (numberOfSessions <= 0) {
-			throw new FormatException(
-					"number of sessions in event must be positive");
-		}
-
 	}
 
-	private static Venue getSourceVenue(String myLine) throws FormatException {
-		String sourceVenueName = myLine.trim();
-		//System.out.println(sourceVenueName);
-		Pattern pattern = Pattern.compile("\\s");
-		Matcher matcher = pattern.matcher(sourceVenueName);
-		boolean found = matcher.find();
-		Venue sourceVenue;
-		if (!found) {
-			sourceVenue = new Venue(sourceVenueName);
-			if (setOfVenues.contains(sourceVenueName)) {
-
-				throw new FormatException(
-						"venues cannot appear twice in schedule");
-			}
-			setOfVenues.add(sourceVenueName);
+	/**
+	 * Reads the session number as the first token from the line scanner and
+	 * checks that it is the expected session number.
+	 * 
+	 * @require lineScanner!=null && lineScanner is open for reading
+	 * @ensure reads the next integer token from the scanner lineScanner
+	 * @throws FormatException
+	 *             if lineScanner.hasNextInt() is false or the integer is not
+	 *             equal to expectedSessionNumber
+	 */
+	private static void readSessionNumber(Scanner lineScanner, int lineNumber,
+			int expectedSessionNumber) throws FormatException {
+		int session = 0;
+		if (lineScanner.hasNextInt()) {
+			session = lineScanner.nextInt();
 		} else {
-
-			//System.out.println(sourceVenueName + " " + numberOfSessions);
-			throw new FormatException("venue names cannot contain spaces");
+			throw new FormatException("Line " + lineNumber
+					+ ": missing session number " + expectedSessionNumber);
 		}
-		return sourceVenue;
+		if (session != expectedSessionNumber) {
+			throw new FormatException("Line " + lineNumber
+					+ ": wrong session number. Expected "
+					+ expectedSessionNumber + " but was " + session);
+		}
 	}
 
-	private static Set<Service> getServicesFromVenue(Scanner s,
-			Venue sourceVenue) throws FormatException {
-		// loop over the sessions
-		Set<Service> services = new HashSet<Service>();
-		for (int j = 0; j < numberOfSessions; j++) {
-			if(s.hasNextLine()){
-				String line = s.nextLine().trim();
-				//System.out.println(line);
-				Scanner sc = new Scanner(line);
-				if (Integer.parseInt(sc.next()) == (j + 1)) {
-					while (sc.hasNext()) {
-						Service newService;
-						try {
-							newService = new Service(sourceVenue, new Venue(
-									sc.next()), j + 1);
-							if (!services.contains(newService)) {
-								services.add(newService);
-							} else {
-								throw new FormatException("Duplicate service found");
-							}
-	
-						} catch (InvalidServiceException e) {
-							sc.close();
-							throw new FormatException("Service not valid");
-						}
-					}
-				} else {
-					sc.close();
-					//System.out.println(line + " " + j);
-					throw new FormatException("timetable must have every session "
-							+ "listed for each venue");
-				}
-				sc.close();
-			}else{
-				throw new FormatException("File appears to terminate mid venue description");
-			}
+	/**
+	 * @require timetable!=null && source !=null && destination !=null &&
+	 *          session > 0
+	 * @ensure creates a new service with given source, destination and session
+	 *         and adds it to timetable
+	 * @throws FormatException
+	 *             if source.equals(destination) or timetable already contains
+	 *             the service
+	 */
+	private static void addService(int lineNumber, ShuttleTimetable timetable,
+			Venue source, Venue destination, int session)
+			throws FormatException {
+		if (source.equals(destination)) {
+			throw new FormatException("Line " + lineNumber
+					+ ": source and destination must be distinct for a service");
 		}
-
-		return services;
+		Service service = new Service(source, destination, session);
+		if (timetable.hasService(service)) {
+			throw new FormatException("Line " + lineNumber
+					+ ": duplicate service detected");
+		}
+		timetable.addService(service);
 	}
+
+	/**
+	 * Checks that the given line is empty.
+	 * 
+	 * @throws FormatException
+	 *             if line is not equal to the empty string.
+	 */
+	private static void checkLineIsEmpty(String line, int lineNumber)
+			throws FormatException {
+		if (!EMPTY_LINE.equals(line)) {
+			throw new FormatException("Empty line expected on line "
+					+ lineNumber);
+		}
+	}
+
 }
