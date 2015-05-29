@@ -5,6 +5,7 @@ import javax.swing.*;
 import festival.Event;
 
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.util.Iterator;
 
 /**
@@ -15,12 +16,15 @@ public class PlannerView extends JFrame {
 
 	// the model of the Festival Planner
 	private PlannerModel model;
-	private JTextArea display; // displays the current plan
 	private Font font= new Font("SanSerif",Font.BOLD,20); //sets the font
-	private JButton[] eventInButtons;
-	private JButton[] eventOutButtons;
+	private JButton[] eventInButtons; //the lineup
+	private JButton[] eventOutButtons;// the plan
 	private JTextField outDisplay;
 	private JTextField inDisplay;
+	private JPanel planPanel;
+	private JPanel lineUpPanel;
+	private Container c;
+	
 
 	// REMOVE THIS LINE AND DECLARE ANY ADDITIONAL VARIABLES YOU REQUIRE HERE
 
@@ -31,9 +35,9 @@ public class PlannerView extends JFrame {
 		this.model = model;
 		
 		setTitle("Festival Planner");
-		setBounds(400,200,1250,500);
+		setBounds(400,200,1000,500);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		Container c = getContentPane();
+		c = getContentPane();
 		try {
 			this.model.loadLineUp();
 		} catch (Exception e) {
@@ -46,17 +50,17 @@ public class PlannerView extends JFrame {
 			JOptionPane.showMessageDialog(c, "Error Loading Shuttle Timetable: "+e.getMessage());
 			System.exit(0);
 		}
-		addPlanOutput(c);
-		addPlanInput(c);
+		addPlanOutput();
+		addPlanInput();
 	}
 
 	
 
-	private void addPlanOutput(Container c) {
+	private void addPlanOutput() {
 		
-		JPanel p = new JPanel();
+		planPanel = new JPanel();
 		
-		outDisplay = new JTextField("Current Plan",15);
+		outDisplay = new JTextField("Current Plan",9);
 		outDisplay.setFont(font);
 		outDisplay.setEditable(false);
 		outDisplay.setBackground(Color.WHITE);
@@ -70,42 +74,44 @@ public class PlannerView extends JFrame {
 			eventsIterator.next();
 		}
 
-		p.setLayout(new GridLayout(i+1,1));
-		p.add(outDisplay,"North");
+		planPanel.setLayout(new GridLayout(i+1,1));
+		planPanel.add(outDisplay,"North");
 		if(i==0){
 			eventOutButtons = new JButton [1];
 			eventOutButtons[0] = new JButton("Current Plan Is Empty");
 			eventOutButtons[0].setFont(font);
 			eventOutButtons[0].setBackground(Color.WHITE);
 			
-			p.add(eventOutButtons[0]);
+			//planPanel.add(eventOutButtons[0]);
+			planPanel.add(new JTextField("Current Plan Is Empty"));
 		} else {
 			
 			eventOutButtons = new JButton [i];
-			eventsIterator = model.getLineUp().iterator();
+			eventsIterator = model.getPlan().iterator();
 			i=0;
 			while (eventsIterator.hasNext()) {
 				
 				eventOutButtons[i] = new JButton(eventsIterator.next().toString());
 				eventOutButtons[i].setFont(font);
+				eventOutButtons[i].setPreferredSize(new Dimension(400,1) );
 				eventOutButtons[i].setBackground(Color.WHITE);
-				p.add(eventOutButtons[i]);
+				planPanel.add(eventOutButtons[i]);
 				i++;
 			}
 		}
-		c.add(p,"West");
+		c.add(planPanel,"West");
 		
 	}
 
-	private void addPlanInput(Container c) {
+	private void addPlanInput() {
 		Iterator<Event> eventsIterator = model.getLineUp().iterator();	
-		JPanel p = new JPanel();
+		lineUpPanel = new JPanel();
 		
 		inDisplay = new JTextField("Events in Line Up",15);
 		inDisplay.setFont(font);
 		inDisplay.setEditable(false);
 		inDisplay.setBackground(Color.WHITE);
-		p.add(inDisplay,"North");
+		lineUpPanel.add(inDisplay,"North");
 		
 		int i = 0;
 		while (eventsIterator.hasNext()){
@@ -113,21 +119,42 @@ public class PlannerView extends JFrame {
 			eventsIterator.next();
 		}
 
-		p.setLayout(new GridLayout(i+1,1));
+		lineUpPanel.setLayout(new GridLayout(i+1,1));
 		eventInButtons = new JButton [i];
 		eventsIterator = model.getLineUp().iterator();
 		i=0;
 		while (eventsIterator.hasNext()) {
-			
-			eventInButtons[i] = new JButton(eventsIterator.next().toString());
+			Event myEvent = eventsIterator.next();
+			eventInButtons[i] = new JButton(myEvent.toString());
 			eventInButtons[i].setFont(font);
 			eventInButtons[i].setBackground(Color.WHITE);
-			p.add(eventInButtons[i]);
+			eventInButtons[i].putClientProperty("event",myEvent);
+			lineUpPanel.add(eventInButtons[i]);
 			i++;
 		}
-		
-		c.add(p,"East");
+	
+		c.add(lineUpPanel,"East");
 		
 	}
+	
+	
+	public void addAdditionListener(ActionListener pl, int n) {
+		eventInButtons[n].addActionListener(pl);
+	}
+
+
+
+	public void updatePlan() {
+		planPanel.removeAll();
+
+		
+		addPlanOutput();
+
+		planPanel.updateUI();
+		planPanel.revalidate();
+	}
+
+
+	
 
 }

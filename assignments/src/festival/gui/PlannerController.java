@@ -1,5 +1,13 @@
 package festival.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Iterator;
+
+import javax.swing.JButton;
+
+import festival.Event;
+
 /**
  * The controller for the Festival Planner.
  */
@@ -18,8 +26,21 @@ public class PlannerController {
 	public PlannerController(PlannerModel model, PlannerView view) {
 		this.model = model;
 		this.view = view;
-		// REMOVE THIS LINE AND COMPLETE THIS METHOD
+		int i=0;
+		for (@SuppressWarnings("unused") Event event: model.getLineUp()){
+			view.addAdditionListener(new AdditionActionListener(), i);
+			i++;
+		}
 	}
 
-	// REMOVE THIS LINE AND ADD YOUR OWN METHODS ETC HERE
+	private class AdditionActionListener implements ActionListener {
+		public void actionPerformed(ActionEvent e){
+			Event myEvent  = (Event)((JButton)e.getSource()).getClientProperty("event");
+			int result = model.addEventToPlan(myEvent);
+			System.out.println(""+result);
+			if(result==0){
+				view.updatePlan();
+			}
+		}
+	}
 }
