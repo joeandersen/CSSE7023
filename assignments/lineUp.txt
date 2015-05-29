@@ -3,3 +3,6 @@ Def Leppard: session 2 at v1
 Slash: session 3 at v1
 Toto: session 4 at v1
 Five Finger Death Punch: session 5 at v1
+Foo Fighters: session 1 at v2
+Bar Fighters: session 3 at v5
+Queen: session 5 at v2

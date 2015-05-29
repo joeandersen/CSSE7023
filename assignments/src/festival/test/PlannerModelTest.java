@@ -32,7 +32,11 @@ public class PlannerModelTest {
 			new Event(new Venue("v1"),2, "Def Leppard"),
 			new Event(new Venue("v1"), 3, "Slash"),
 			new Event(new Venue("v1"), 4, "Toto"),
-			new Event(new Venue("v1"), 5, "Five Finger Death Punch")
+			new Event(new Venue("v1"), 5, "Five Finger Death Punch"),
+			new Event(new Venue("v2"), 1, "Foo Fighters"),
+			new Event(new Venue("v5"), 3, "Bar Fighters"),
+			new Event(new Venue("v2"), 5, "Queen")
+	
 			 };
 	
 
@@ -48,15 +52,19 @@ public class PlannerModelTest {
 		testLineUp.addEvent(events[2]);
 		testLineUp.addEvent(events[3]);
 		testLineUp.addEvent(events[4]);
+		testLineUp.addEvent(events[5]);
+		testLineUp.addEvent(events[6]);
+		testLineUp.addEvent(events[7]);
 		
 		System.out.println(testLineUp);
+		System.out.println("------");
 		System.out.println(model.getLineUp());
 		
 
 		Assert.assertTrue(testLineUp.toString().equals(model.getLineUp().toString()));
 	}
 	
-	
+	@Test
 	public void testLineUpLoadb() throws IOException, FormatException {
 
 		PlannerModel model = new PlannerModel();
@@ -125,4 +133,32 @@ public class PlannerModelTest {
 
 		Assert.assertFalse(testTimeTable.toString().equals(model.getTimeTable().toString()));
 	}
+	
+	@Test
+	public void testAddingtoPlan() throws IOException, FormatException{
+		PlannerModel model = new PlannerModel();
+		model.loadTimeTable();
+		model.loadLineUp();
+		Assert.assertTrue(0==model.addEventToPlan(events[0]));
+		Assert.assertTrue(1==model.addEventToPlan(events[0]));
+		Assert.assertTrue(2==model.addEventToPlan(events[5]));
+		Assert.assertTrue(3==model.addEventToPlan(events[7]));
+		Assert.assertTrue(0==model.addEventToPlan(events[4]));
+		
+		
+	}
+	
+	@Test
+	public void testAddingtoPlanb() throws IOException, FormatException{
+		PlannerModel model = new PlannerModel();
+		model.loadTimeTable();
+		model.loadLineUp();
+		Assert.assertTrue(0==model.addEventToPlan(events[6]));
+		Assert.assertTrue(4==model.addEventToPlan(events[5]));
+		
+		
+		
+	}
+	
+	
 }
